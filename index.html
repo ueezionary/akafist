@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Акафист - 3D Превью</title>
+    <!-- Совместимая версия jQuery 1.12.4, с которой Turn.js реагирует на мышь -->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+    
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: #181818;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            user-select: none;
+        }
+        .wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        #flipbook {
+            width: 900px;
+            height: 600px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+        }
+        .page {
+            background-color: #fff;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            cursor: pointer;
+        }
+        /* Кнопки перелистывания */
+        .btn-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            font-size: 28px;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 1000;
+        }
+        .btn-nav:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-50%) scale(1.1);
+        }
+        #prev-btn { left: -75px; }
+        #next-btn { right: -75px; }
+
+        .hint {
+            position: absolute;
+            bottom: -45px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #777;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <button class="btn-nav" id="prev-btn">&#10094;</button>
+    <div id="flipbook"></div>
+    <button class="btn-nav" id="next-btn">&#10095;</button>
+    <div class="hint">Кликай по стрелкам по бокам, по самой странице или жми стрелки на клавиатуре ← →</div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var flipbook = $('#flipbook');
+    var totalPages = 56;
+
+    // Генерация страниц под твои имена файлов
+    for (var i = 1; i <= totalPages; i++) {
+        var pageNum = i < 10 ? '0' + i : i;
+        var fileName = 'я_Страница_' + pageNum + '.jpg';
+        var pageDiv = $('<div class="page"></div>').css('background-image', 'url("' + encodeURI(fileName) + '")');
+        flipbook.append(pageDiv);
+    }
+
+    // Инициализация Turn.js
+    flipbook.turn({
+        width: 900,
+        height: 600,
+        autoCenter: true,
+        display: 'double',
+        elevation: 50,
+        gradients: true,
+        duration: 800
+    });
+
+    // Перелистывание по кнопкам
+    $('#prev-btn').click(function() {
+        flipbook.turn('previous');
+    });
+    $('#next-btn').click(function() {
+        flipbook.turn('next');
+    });
+
+    // Перелистывание по клику на половинки книги
+    flipbook.on('click', function(e) {
+        var offset = $(this).offset();
+        var clickX = e.pageX - offset.left;
+        if (clickX > 450) {
+            flipbook.turn('next');
+        } else {
+            flipbook.turn('previous');
+        }
+    });
+
+    // Управление стрелками клавиатуры
+    $(document).keydown(function(e) {
+        if (e.keyCode === 37) {
+            flipbook.turn('previous');
+        } else if (e.keyCode === 39) {
+            flipbook.turn('next');
+        }
+    });
+});
+</script>
+</body>
+</html>
