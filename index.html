@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Акафист - 3D Превью</title>
-    <!-- Совместимая версия jQuery 1.12.4, с которой Turn.js реагирует на мышь -->
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
     
@@ -37,7 +36,6 @@
             background-repeat: no-repeat;
             cursor: pointer;
         }
-        /* Кнопки перелистывания */
         .btn-nav {
             position: absolute;
             top: 50%;
@@ -80,23 +78,40 @@
     <button class="btn-nav" id="prev-btn">&#10094;</button>
     <div id="flipbook"></div>
     <button class="btn-nav" id="next-btn">&#10095;</button>
-    <div class="hint">Кликай по стрелкам по бокам, по самой странице или жми стрелки на клавиатуре ← →</div>
+    <div class="hint">Листайте стрелками на экране, кликом по странице или стрелками на клавиатуре ← →</div>
 </div>
 
 <script>
 $(document).ready(function() {
     var flipbook = $('#flipbook');
-    var totalPages = 56;
+    var totalTextPages = 56;
 
-    // Генерация страниц под твои имена файлов
-    for (var i = 1; i <= totalPages; i++) {
-        var pageNum = i < 10 ? '0' + i : i;
-        var fileName = 'я_Страница_' + pageNum + '.jpg';
+    // Вспомогательная функция добавления страницы с кодированием русских букв
+    function addPage(fileName) {
         var pageDiv = $('<div class="page"></div>').css('background-image', 'url("' + encodeURI(fileName) + '")');
         flipbook.append(pageDiv);
     }
 
-    // Инициализация Turn.js
+    // 1. Лицевая обложка (снаружи)
+    addPage('обл_1.png');
+
+    // 2. Внутренняя обложка (форзац слева)
+    addPage('обл_вн.png');
+
+    // 3. Страницы блока акафиста (с 1 по 56)
+    for (var i = 1; i <= totalTextPages; i++) {
+        var pageNum = i < 10 ? '0' + i : i;
+        var fileName = 'я_Страница_' + pageNum + '.jpg';
+        addPage(fileName);
+    }
+
+    // 4. Задний форзац (справа)
+    addPage('обл_вн.png');
+
+    // 5. Задняя обложка (снаружи)
+    addPage('обл_2.png');
+
+    // Запуск книги
     flipbook.turn({
         width: 900,
         height: 600,
@@ -107,15 +122,10 @@ $(document).ready(function() {
         duration: 800
     });
 
-    // Перелистывание по кнопкам
-    $('#prev-btn').click(function() {
-        flipbook.turn('previous');
-    });
-    $('#next-btn').click(function() {
-        flipbook.turn('next');
-    });
+    // Навигация
+    $('#prev-btn').click(function() { flipbook.turn('previous'); });
+    $('#next-btn').click(function() { flipbook.turn('next'); });
 
-    // Перелистывание по клику на половинки книги
     flipbook.on('click', function(e) {
         var offset = $(this).offset();
         var clickX = e.pageX - offset.left;
@@ -126,7 +136,6 @@ $(document).ready(function() {
         }
     });
 
-    // Управление стрелками клавиатуры
     $(document).keydown(function(e) {
         if (e.keyCode === 37) {
             flipbook.turn('previous');
