@@ -78,40 +78,39 @@
     <button class="btn-nav" id="prev-btn">&#10094;</button>
     <div id="flipbook"></div>
     <button class="btn-nav" id="next-btn">&#10095;</button>
-    <div class="hint">Листайте стрелками на экране, кликом по странице или стрелками на клавиатуре ← →</div>
+    <div class="hint">Листайте стрелками на экране, кликом по странице или клавишами ← →</div>
 </div>
 
 <script>
 $(document).ready(function() {
     var flipbook = $('#flipbook');
-    var totalTextPages = 56;
+    var totalTextPages = 52; // Теперь ровно 52 страницы текста
 
-    // Вспомогательная функция добавления страницы с кодированием русских букв
     function addPage(fileName) {
         var pageDiv = $('<div class="page"></div>').css('background-image', 'url("' + encodeURI(fileName) + '")');
         flipbook.append(pageDiv);
     }
 
-    // 1. Лицевая обложка (снаружи)
+    // 1. Лицевая обложка (JPG)
     addPage('обл_1.jpg');
 
-    // 2. Внутренняя обложка (форзац слева)
+    // 2. Внутренний передний форзац (JPG)
     addPage('обл_вн.jpg');
 
-    // 3. Страницы блока акафиста (с 1 по 56)
+    // 3. Страницы блока акафиста с префиксом "тест_Страница_" (от 01 до 52)
     for (var i = 1; i <= totalTextPages; i++) {
         var pageNum = i < 10 ? '0' + i : i;
-        var fileName = 'я_Страница_' + pageNum + '.jpg';
+        var fileName = 'тест_Страница_' + pageNum + '.jpg';
         addPage(fileName);
     }
 
-    // 4. Задний форзац (справа)
+    // 4. Задний форзац (JPG)
     addPage('обл_вн.jpg');
 
-    // 5. Задняя обложка (снаружи)
+    // 5. Задняя обложка (JPG)
     addPage('обл_2.jpg');
 
-    // Запуск книги
+    // Инициализация книги
     flipbook.turn({
         width: 900,
         height: 600,
@@ -122,10 +121,11 @@ $(document).ready(function() {
         duration: 800
     });
 
-    // Навигация
+    // Навигация кнопками
     $('#prev-btn').click(function() { flipbook.turn('previous'); });
     $('#next-btn').click(function() { flipbook.turn('next'); });
 
+    // Навигация по клику на половинки страницы
     flipbook.on('click', function(e) {
         var offset = $(this).offset();
         var clickX = e.pageX - offset.left;
@@ -136,6 +136,7 @@ $(document).ready(function() {
         }
     });
 
+    // Навигация стрелками на клавиатуре
     $(document).keydown(function(e) {
         if (e.keyCode === 37) {
             flipbook.turn('previous');
